@@ -2,49 +2,55 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>چک‌لیست شمسی</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist</title>
+
+  <!-- Manifest -->
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#ff4d4d">
+
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
-    input, button { padding: 8px; margin: 4px; }
-    ul { list-style: none; padding: 0; }
-    li { 
-      background: white; 
-      padding: 8px; 
-      margin: 4px 0; 
-      border-radius: 4px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
     }
-    li button { 
-      margin-left: 8px; 
-      background-color: #ff4d4d; 
-      color: white; 
-      border: none; 
-      padding: 4px 8px; 
-      border-radius: 4px; 
-      cursor: pointer; 
+    input, button {
+      padding: 10px;
+      font-size: 16px;
     }
-    li button:hover { background-color: #e60000; }
+    ul {
+      margin-top: 20px;
+      padding: 0;
+    }
+    li {
+      list-style: none;
+      background: #fff;
+      margin-bottom: 8px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
 </head>
 <body>
-  <h2>چک‌لیست</h2>
-  <input type="text" id="title" placeholder="عنوان">
-  <input type="text" id="desc" placeholder="توضیح">
-  <button onclick="addItem()">اضافه کردن</button>
-  <button onclick="exportJSON()">خروجی JSON</button>
+
+  <h2>چک لیست</h2>
+
+  <input id="text" placeholder="متن آیتم">
+  <button onclick="addItem()">اضافه کن</button>
 
   <ul id="list"></ul>
 
-  <script src="app.js"></script>
+  <script src="./app.js"></script>
+
+  <!-- Service Worker -->
   <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js');
-}
-</script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js');
+      });
+    }
+  </script>
+
 </body>
 </html>
-
