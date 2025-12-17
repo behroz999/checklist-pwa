@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>چک‌لیست شمسی</title>
-  <link rel="manifest" href="./checklist-pwa/manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#ff4d4d">
   <style>
     body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
@@ -42,11 +42,12 @@
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./checklist-pwa/service-worker.js')
+      navigator.serviceWorker.register('./service-worker.js')
         .then(() => console.log('Service Worker registered'))
         .catch(err => console.error('Service Worker error:', err));
     }
   </script>
 </body>
 </html>
+
 
