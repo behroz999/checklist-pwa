@@ -6,7 +6,7 @@
   <title>Checklist</title>
 
   <!-- Manifest -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="checklist-pwa/manifest.json">
   <style>
     body {
       font-family: sans-serif;
@@ -46,13 +46,14 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js');
+        navigator.serviceWorker.register('checklist-pwa/service-worker.js');
       });
     }
   </script>
 
 </body>
 </html>
+
 
 
 
