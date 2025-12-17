@@ -2,59 +2,50 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checklist</title>
-
-  <!-- Manifest -->
-  <link rel="manifest" href="./checklist-pwa/manifest.json">
+  <title>چک‌لیست شمسی</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff4d4d">
   <style>
-    body {
-      font-family: sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
+    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+    input, button { padding: 8px; margin: 4px; }
+    ul { list-style: none; padding: 0; }
+    li { 
+      background: white; 
+      padding: 8px; 
+      margin: 4px 0; 
+      border-radius: 4px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
+    li button { 
+      margin-left: 8px; 
+      background-color: #ff4d4d; 
+      color: white; 
+      border: none; 
+      padding: 4px 8px; 
+      border-radius: 4px; 
+      cursor: pointer; 
     }
-    ul {
-      margin-top: 20px;
-      padding: 0;
-    }
-    li {
-      list-style: none;
-      background: #fff;
-      margin-bottom: 8px;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-    }
+    li button:hover { background-color: #e60000; }
   </style>
 </head>
 <body>
-
-  <h2>چک لیست</h2>
-
-  <input id="text" placeholder="متن آیتم">
-  <button onclick="addItem()">اضافه کن</button>
+  <h2>چک‌لیست</h2>
+  <input type="text" id="title" placeholder="عنوان">
+  <input type="text" id="desc" placeholder="توضیح">
+  <button onclick="addItem()">اضافه کردن</button>
+  <button onclick="exportJSON()">خروجی JSON</button>
 
   <ul id="list"></ul>
 
-  <script src="./app.js"></script>
-
-  <!-- Service Worker -->
+  <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./checklist-pwa/service-worker.js');
-      });
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.error('Service Worker error:', err));
     }
   </script>
-
 </body>
 </html>
-
-
-
-
-
