@@ -1,55 +1,147 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <base href="/checklist-pwa/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>چک‌لیست شمسی</title>
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ff4d4d">
+
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
-    input, button { padding: 8px; margin: 4px; }
-    ul { list-style: none; padding: 0; }
-    li { 
-      background: white; 
-      padding: 8px; 
-      margin: 4px 0; 
-      border-radius: 4px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
     }
-    li button { 
-      margin-left: 8px; 
-      background-color: #ff4d4d; 
-      color: white; 
-      border: none; 
-      padding: 4px 8px; 
-      border-radius: 4px; 
-      cursor: pointer; 
+
+    .container {
+      width: 100%;
+      max-width: 420px; /* موبایل */
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
     }
-    li button:hover { background-color: #e60000; }
+
+    h2 { text-align: center; }
+
+    input, button {
+      width: 100%;
+      padding: 8px;
+      margin: 4px 0;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #ff4d4d;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #e60000; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 6px;
+      text-align: right;
+    }
+
+    th {
+      background: #eee;
+      cursor: pointer;
+    }
+
+    .actions button {
+      width: auto;
+      margin-left: 4px;
+      padding: 4px 6px;
+      font-size: 12px;
+    }
+
+    .edit {
+      background: #2196f3;
+    }
+
+    .delete {
+      background: #f44336;
+    }
+    #contextMenu {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 999;
+  display: flex;
+  gap: 10px;
+}
+
+#contextMenu button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#contextMenu button:first-child {
+  background: #ffc107;
+}
+
+#contextMenu button:last-child {
+  background: #ff4d4d;
+  color: white;
+}
+
   </style>
 </head>
+
 <body>
+<div class="container">
   <h2>چک‌لیست</h2>
-  <input type="text" id="title" placeholder="عنوان">
-  <input type="text" id="desc" placeholder="توضیح">
-  <button onclick="addItem()">اضافه کردن</button>
-  <button onclick="exportJSON()">خروجی JSON</button>
 
-  <ul id="list"></ul>
+  <input id="title" placeholder="عنوان">
+  <input id="desc" placeholder="توضیح">
+  <button onclick="addItem()">➕ اضافه</button>
 
-  <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registered'))
-        .catch(err => console.error('Service Worker error:', err));
-    }
-  </script>
+  <input id="search" placeholder="🔍 جستجو..." oninput="renderList()">
+
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortBy('title')">عنوان</th>
+        <th onclick="sortBy('desc')">توضیح</th>
+        <th onclick="sortBy('date')">تاریخ</th>
+        <th>عملیات</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+
+  <button onclick="exportJSON()">📤 خروجی JSON</button>
+</div>
+
+<script src="app.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
 </body>
 </html>
-
-
-
