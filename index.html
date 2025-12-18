@@ -6,98 +6,92 @@
   <title>چک‌لیست</title>
 
   <style>
-    body {
-      font-family: sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 10px;
+    body{
+      font-family:sans-serif;
+      background:#f5f5f5;
+      margin:0;
+      padding:10px
     }
-
-    .container {
-      max-width: 420px;
-      margin: auto;
-      background: #fff;
-      padding: 12px;
-      border-radius: 8px;
+  
+    .container{
+      max-width:420px;
+      margin:auto;
+      background:#fff;
+      padding:12px;
+      border-radius:8px
     }
-
-    input, select, button {
-      width: 100%;
-      padding: 8px;
-      margin: 4px 0;
-      box-sizing: border-box;
+  
+    input,select,button{
+      width:100%;
+      padding:8px;
+      margin:4px 0
     }
-
-    button {
-      background: #ff4d4d;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+  
+    button{
+      background:#ff4d4d;
+      color:#fff;
+      border:none;
+      border-radius:4px
     }
-
-    button:hover {
-      background: #e60000;
+  
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      font-size:14px;
+      table-layout:fixed;   /* کنترل عرض ستون‌ها */
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 14px;
-      table-layout: fixed; /* برای کنترل عرض دقیق ستون‌ها */
+  
+    th,td{
+      border-bottom:1px solid #ddd;
+      padding:6px;
+      text-align:right;
+      vertical-align:top;
+      word-break:break-word;
+      white-space:normal;
     }
-
-    th, td {
-      border-bottom: 1px solid #ddd;
-      padding: 6px;
-      text-align: right;
-      word-break: break-word;
-      white-space: normal; /* متن طولانی چند خطی شود */
+  
+    th{
+      background:#eee
     }
-
-    th {
-      background: #eee;
-      cursor: pointer;
+  
+    /* --- عرض ستون‌ها --- */
+    th:nth-child(1), td:nth-child(1){ width:42%; }  /* عنوان */
+    th:nth-child(2), td:nth-child(2){ width:34%; }  /* توضیح */
+    th:nth-child(3), td:nth-child(3){ width:90px; } /* تاریخ (دست نخورده) */
+    th:nth-child(4), td:nth-child(4){ width:80px; } /* وضعیت */
+  
+    /* ستون عملیات: بدون width ثابت */
+    th:nth-child(5), td:nth-child(5){
+      text-align:center;
+      white-space:nowrap;
     }
-
-    /* ستون تاریخ و وضعیت عرض مناسب داشته باشند */
-    th:nth-child(3), td:nth-child(3) {
-      width: 80px;
+  
+    /* تصویر عملیات */
+    .op-img{
+      width:36px;
+      height:36px;
+      border-radius:6px;
+      object-fit:cover;
+      cursor:pointer;
+      display:inline-block;
     }
-
-    th:nth-child(4), td:nth-child(4) {
-      width: 80px;
-    }
-
-    /* ستون عنوان و توضیح باقی فضای جدول را پر کنند */
-    th:nth-child(1), td:nth-child(1),
-    th:nth-child(2), td:nth-child(2) {
-      width: 80px;
-    }
-
-    .op-img {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      object-fit: cover;
-      cursor: pointer;
-    }
-
-    #contextMenu {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,.3);
-      border-radius: 10px;
-      padding: 10px;
-      display: flex;
-      gap: 10px;
-      z-index: 999;
+  
+    #contextMenu{
+      position:fixed;
+      bottom:20px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#fff;
+      box-shadow:0 4px 12px rgba(0,0,0,.3);
+      border-radius:10px;
+      padding:10px;
+      display:flex;
+      gap:10px;
+      z-index:999
     }
   </style>
+  
 </head>
 <body>
 <div class="container">
