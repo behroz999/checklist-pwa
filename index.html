@@ -6,17 +6,97 @@
   <title>چک‌لیست</title>
 
   <style>
-    body{font-family:sans-serif;background:#f5f5f5;margin:0;padding:10px}
-    .container{max-width:420px;margin:auto;background:#fff;padding:12px;border-radius:8px}
-    input,select,button{width:100%;padding:8px;margin:4px 0}
-    button{background:#ff4d4d;color:#fff;border:none;border-radius:4px}
-    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
-    th,td{border-bottom:1px solid #ddd;padding:6px;text-align:right}
-    th{background:#eee}
-    .op-img{width:36px;height:36px;border-radius:6px;object-fit:cover;cursor:pointer}
-    #contextMenu{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-      background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.3);
-      border-radius:10px;padding:10px;display:flex;gap:10px;z-index:999}
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: auto;
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin: 4px 0;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #ff4d4d;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e60000;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+      table-layout: fixed; /* برای کنترل عرض دقیق ستون‌ها */
+    }
+
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 6px;
+      text-align: right;
+      word-break: break-word;
+      white-space: normal; /* متن طولانی چند خطی شود */
+    }
+
+    th {
+      background: #eee;
+      cursor: pointer;
+    }
+
+    /* ستون تاریخ و وضعیت عرض مناسب داشته باشند */
+    th:nth-child(3), td:nth-child(3) {
+      width: 80px;
+    }
+
+    th:nth-child(4), td:nth-child(4) {
+      width: 80px;
+    }
+
+    /* ستون عنوان و توضیح باقی فضای جدول را پر کنند */
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(2), td:nth-child(2) {
+      width: 80px;
+    }
+
+    .op-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    #contextMenu {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
@@ -30,6 +110,7 @@
     <option value="انجام شده">انجام شده</option>
     <option value="لغو شده">لغو شده</option>
   </select>
+
   <button onclick="addItem()">➕ اضافه</button>
   <button onclick="exportExcel()">📊 خروجی اکسل</button>
 
@@ -37,19 +118,19 @@
 
   <table>
     <thead>
-        <tr>
-          <th onclick="sortBy('title')">عنوان</th>
-          <th onclick="sortBy('desc')">توضیح</th>
-          <th onclick="sortBy('date')">تاریخ</th>
-          <th onclick="sortBy('status')">وضعیت</th>
-          <th>عملیات</th>
-        </tr>
-      </thead>
-      
+      <tr>
+        <th onclick="sortBy('title')">عنوان</th>
+        <th onclick="sortBy('desc')">توضیح</th>
+        <th onclick="sortBy('date')">تاریخ</th>
+        <th onclick="sortBy('status')">وضعیت</th>
+        <th>عکس</th>
+      </tr>
+    </thead>
     <tbody id="list"></tbody>
   </table>
 </div>
-<!-- SheetJS -->
+
+<!-- کتابخانه‌ها برای خروجی اکسل -->
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
 
