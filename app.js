@@ -1,30 +1,34 @@
-// دیتابیس IndexedDB
 let db;
+let items = [];
+let currentSort = { key: 'timestamp', asc: false };
+let longPressTimer = null;
+
+// ---------- IndexedDB ----------
 const request = indexedDB.open("ChecklistDB_v2", 1);
 
-request.onerror = function(event) { console.error("خطا در باز کردن دیتابیس", event); };
-request.onsuccess = function(event) { db = event.target.result; loadItems(); };
-request.onupgradeneeded = function(event) {
-  db = event.target.result;
-  if(!db.objectStoreNames.contains("items")) {
-    const objectStore = db.createObjectStore("items", { keyPath: "id", autoIncrement: true });
-    objectStore.createIndex("timestamp", "timestamp", { unique: false });
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  if (!db.objectStoreNames.contains("items")) {
+    const store = db.createObjectStore("items", { keyPath: "id", autoIncrement: true });
+    store.createIndex("timestamp", "timestamp");
   }
 };
 
-// آرایه در حافظه
-let items = [];
+request.onsuccess = e => {
+  db = e.target.result;
+  loadItems();
+};
 
-// تبدیل میلادی به شمسی
+// ---------- تاریخ شمسی ----------
 function toJalali(gy, gm, gd) {
   const g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
   let jy = (gy <= 1600) ? 0 : 979;
   gy -= (gy <= 1600) ? 621 : 1600;
   let gy2 = (gm > 2) ? (gy + 1) : gy;
   let days = (365 * gy) + Math.floor((gy2 + 3)/4)
-           - Math.floor((gy2 + 99)/100)
-           + Math.floor((gy2 + 399)/400)
-           - 80 + gd + g_d_m[gm - 1];
+    - Math.floor((gy2 + 99)/100)
+    + Math.floor((gy2 + 399)/400)
+    - 80 + gd + g_d_m[gm - 1];
   jy += 33 * Math.floor(days/12053);
   days %= 12053;
   jy += 4 * Math.floor(days/1461);
@@ -32,85 +36,146 @@ function toJalali(gy, gm, gd) {
   if (days > 365) { jy += Math.floor((days-1)/365); days = (days-1)%365; }
   let jm = (days < 186) ? 1 + Math.floor(days/31) : 7 + Math.floor((days-186)/30);
   let jd = 1 + ((days < 186) ? (days % 31) : ((days-186) % 30));
-  return [jy, jm, jd];
-}
-function getShamsiDate() {
-  const g = new Date();
-  const [jy, jm, jd] = toJalali(g.getFullYear(), g.getMonth()+1, g.getDate());
   return `${jy}/${String(jm).padStart(2,'0')}/${String(jd).padStart(2,'0')}`;
 }
 
-// بارگذاری آیتم‌ها
-function loadItems() {
-  const transaction = db.transaction(["items"], "readonly");
-  const objectStore = transaction.objectStore("items");
-  const request = objectStore.getAll();
-  request.onsuccess = function(event) { items = event.target.result; renderList(); };
+function getShamsiDate() {
+  const d = new Date();
+  return toJalali(d.getFullYear(), d.getMonth()+1, d.getDate());
 }
 
-// اضافه کردن آیتم جدید
+// ---------- CRUD ----------
+function loadItems() {
+  const tx = db.transaction("items", "readonly");
+  tx.objectStore("items").getAll().onsuccess = e => {
+    items = e.target.result;
+    renderList();
+  };
+}
+
 function addItem() {
-  const title = document.getElementById('title').value.trim();
-  const desc = document.getElementById('desc').value.trim();
-  if (!title) return alert('عنوان را وارد کنید');
+  const titleInput = document.getElementById('title');
+  const descInput = document.getElementById('desc');
+  const title = titleInput.value.trim();
+  const desc = descInput.value.trim();
+  if (!title) return alert('عنوان لازم است');
 
   const item = {
-    title, desc,
+    title,
+    desc,
     date: getShamsiDate(),
-    timestamp: new Date().getTime()
+    timestamp: Date.now()
   };
 
-  const transaction = db.transaction(["items"], "readwrite");
-  const objectStore = transaction.objectStore("items");
-  const requestAdd = objectStore.add(item);
-
-  requestAdd.onsuccess = function() {
+  const tx = db.transaction("items", "readwrite");
+  tx.objectStore("items").add(item).onsuccess = () => {
     loadItems();
-    document.getElementById('title').value = '';
-    document.getElementById('desc').value = '';
+    titleInput.value = '';
+    descInput.value = '';
   };
 }
 
-// نمایش لیست و حذف آیتم‌ها
-function renderList() {
-  const ul = document.getElementById('list');
-  ul.innerHTML = '';
-  items.sort((a,b)=>b.timestamp - a.timestamp); // جدیدترین بالا
-  for (let i of items) {
-    const li = document.createElement('li');
-    const textSpan = document.createElement('span');
-    textSpan.innerText = `${i.date} - ${i.title}: ${i.desc}`;
-    li.appendChild(textSpan);
+function deleteItem(id) {
+  const tx = db.transaction("items", "readwrite");
+  tx.objectStore("items").delete(id).onsuccess = () => {
+    hideContextMenu();
+    loadItems();
+  };
+}
 
-    const delBtn = document.createElement('button');
-    delBtn.innerText = 'حذف';
-    delBtn.onclick = function() {
-      const transaction = db.transaction(["items"], "readwrite");
-      const objectStore = transaction.objectStore("items");
-      const requestDelete = objectStore.delete(i.id);
-      requestDelete.onsuccess = function() { loadItems(); };
-      requestDelete.onerror = function(e) { console.error("خطا در حذف آیتم:", e); };
-    };
-    li.appendChild(delBtn);
-    ul.appendChild(li);
+function editItem(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+
+  const newTitle = prompt("عنوان:", item.title);
+  if (newTitle === null) return;
+  const newDesc = prompt("توضیح:", item.desc);
+  if (newDesc === null) return;
+
+  const tx = db.transaction("items", "readwrite");
+  tx.objectStore("items").put({ ...item, title: newTitle, desc: newDesc }).onsuccess = loadItems;
+}
+
+// ---------- Sort + Search ----------
+function sortBy(key) {
+  currentSort.asc = currentSort.key === key ? !currentSort.asc : true;
+  currentSort.key = key;
+  renderList();
+}
+
+function renderList() {
+  const tbody = document.getElementById('list');
+  tbody.innerHTML = '';
+
+  const search = document.getElementById('search').value.toLowerCase();
+
+  const filtered = items
+    .filter(i =>
+      i.title.toLowerCase().includes(search) ||
+      i.desc.toLowerCase().includes(search)
+    )
+    .sort((a, b) => {
+      const valA = a[currentSort.key];
+      const valB = b[currentSort.key];
+      if (typeof valA === 'string') return currentSort.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      return currentSort.asc ? valA - valB : valB - valA;
+    });
+
+  for (const i of filtered) {
+    const tr = document.createElement('tr');
+    tr.id = `row-${i.id}`;
+
+    tr.innerHTML = `
+      <td>${i.title}</td>
+      <td>${i.desc}</td>
+      <td>${i.date}</td>
+    `;
+
+    tr.addEventListener('touchstart', () => {
+      longPressTimer = setTimeout(() => showContextMenu(i.id), 600);
+    });
+    tr.addEventListener('touchend', clearLongPress);
+    tr.addEventListener('touchmove', clearLongPress);
+
+    tbody.appendChild(tr);
   }
 }
 
-// خروجی JSON
-function exportJSON() {
-  const transaction = db.transaction(["items"], "readonly");
-  const objectStore = transaction.objectStore("items");
-  const request = objectStore.getAll();
-  request.onsuccess = function(event) {
-    const allItems = event.target.result;
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allItems, null, 2));
-    const dlAnchor = document.createElement('a');
-    dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", "checklist_backup.json");
-    dlAnchor.click();
-  };
+function clearLongPress() {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
 }
 
-// ============================
-// آماده PWA
-// ============================
+// ---------- Context Menu ----------
+function showContextMenu(id) {
+  hideContextMenu();
+
+  const menu = document.createElement('div');
+  menu.id = 'contextMenu';
+  menu.innerHTML = `
+    <button onclick="editItem(${id})">ویرایش</button>
+    <button onclick="deleteItem(${id})">حذف</button>
+  `;
+
+  document.body.appendChild(menu);
+  setTimeout(() => {
+    document.addEventListener('click', hideContextMenu, { once: true });
+  }, 0);
+}
+
+function hideContextMenu() {
+  const menu = document.getElementById('contextMenu');
+  if (menu) menu.remove();
+}
+
+// ---------- Export ----------
+function exportJSON() {
+  const data = "data:text/json;charset=utf-8," +
+    encodeURIComponent(JSON.stringify(items, null, 2));
+  const a = document.createElement('a');
+  a.href = data;
+  a.download = 'checklist_backup.json';
+  a.click();
+}
