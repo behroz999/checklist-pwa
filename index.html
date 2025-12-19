@@ -12,7 +12,6 @@
       margin:0;
       padding:10px
     }
-  
     .container{
       max-width:420px;
       margin:auto;
@@ -20,28 +19,24 @@
       padding:12px;
       border-radius:8px
     }
-  
     input,select,button{
       width:100%;
       padding:8px;
       margin:4px 0
     }
-  
     button{
       background:#ff4d4d;
       color:#fff;
       border:none;
       border-radius:4px
     }
-  
     table{
       width:100%;
       border-collapse:collapse;
       margin-top:10px;
       font-size:14px;
-      table-layout:fixed;   /* کنترل عرض ستون‌ها */
+      table-layout:fixed;
     }
-  
     th,td{
       border-bottom:1px solid #ddd;
       padding:6px;
@@ -50,24 +45,16 @@
       word-break:break-word;
       white-space:normal;
     }
-  
-    th{
-      background:#eee
-    }
-  
-    /* --- عرض ستون‌ها --- */
-    th:nth-child(1), td:nth-child(1){ width:42%; }  /* عنوان */
-    th:nth-child(2), td:nth-child(2){ width:34%; }  /* توضیح */
-    th:nth-child(3), td:nth-child(3){ width:90px; } /* تاریخ (دست نخورده) */
+    th{ background:#eee }
+    th:nth-child(1), td:nth-child(1){ width:30%; }  /* عنوان */
+    th:nth-child(2), td:nth-child(2){ width:25%; }  /* توضیح */
+    th:nth-child(3), td:nth-child(3){ width:90px; } /* تاریخ */
     th:nth-child(4), td:nth-child(4){ width:80px; } /* وضعیت */
-  
-    /* ستون عملیات: بدون width ثابت */
-    th:nth-child(5), td:nth-child(5){
-      text-align:center;
-      white-space:nowrap;
-    }
-  
-    /* تصویر عملیات */
+    th:nth-child(5), td:nth-child(5){ text-align:center; white-space:nowrap; } /* عکس */
+    th:nth-child(6), td:nth-child(6){ width:30%; } /* نام */
+    th:nth-child(7), td:nth-child(7){ width:30%; } /* شماره تلفن */
+    th:nth-child(8), td:nth-child(8){ width:40%; } /* آدرس */
+
     .op-img{
       width:36px;
       height:36px;
@@ -76,7 +63,6 @@
       cursor:pointer;
       display:inline-block;
     }
-  
     #contextMenu{
       position:fixed;
       bottom:20px;
@@ -90,8 +76,11 @@
       gap:10px;
       z-index:999
     }
+    .tab-btns{display:flex;gap:5px;margin-top:10px}
+    .tab-btns button{flex:1}
+    .tab{display:none}
+    .tab.active{display:block}
   </style>
-  
 </head>
 <body>
 <div class="container">
@@ -105,29 +94,50 @@
     <option value="لغو شده">لغو شده</option>
   </select>
 
+  <input id="name" placeholder="نام">
+  <input id="phone" placeholder="شماره تلفن">
+  <input id="address" placeholder="آدرس">
+
   <button onclick="addItem()">➕ اضافه</button>
   <button onclick="exportExcel()">📊 خروجی اکسل</button>
-
   <input id="search" placeholder="جستجو..." oninput="renderList()">
 
-  <table>
-    <thead>
-      <tr>
-        <th onclick="sortBy('title')">عنوان</th>
-        <th onclick="sortBy('desc')">توضیح</th>
-        <th onclick="sortBy('date')">تاریخ</th>
-        <th onclick="sortBy('status')">وضعیت</th>
-        <th>عکس</th>
-      </tr>
-    </thead>
-    <tbody id="list"></tbody>
-  </table>
+  <div class="tab-btns">
+    <button onclick="showTab(0)">صفحه 1</button>
+    <button onclick="showTab(1)">صفحه 2</button>
+  </div>
+
+  <div class="tab active" id="tab-0">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('title')">عنوان</th>
+          <th onclick="sortBy('desc')">توضیح</th>
+          <th onclick="sortBy('date')">تاریخ</th>
+          <th onclick="sortBy('status')">وضعیت</th>
+          <th>عکس</th>
+        </tr>
+      </thead>
+      <tbody id="list-0"></tbody>
+    </table>
+  </div>
+
+  <div class="tab" id="tab-1">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('name')">نام</th>
+          <th onclick="sortBy('phone')">شماره تلفن</th>
+          <th onclick="sortBy('address')">آدرس</th>
+        </tr>
+      </thead>
+      <tbody id="list-1"></tbody>
+    </table>
+  </div>
 </div>
 
-<!-- کتابخانه‌ها برای خروجی اکسل -->
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
-
 <script src="app.js"></script>
 </body>
 </html>
