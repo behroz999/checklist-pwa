@@ -2,6 +2,9 @@ let db;
 let items = [];
 let currentSort = { key: null, asc: true };
 let longPressTimer = null;
+let startX = 0;
+let currentTab = 0;
+const tabs = document.querySelectorAll('.tab');
 
 // ---------- IndexedDB ----------
 const request = indexedDB.open("ChecklistDB_v3", 1);
@@ -253,3 +256,31 @@ async function exportExcel(){
     saveAs(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),"checklist.xlsx");
   });
 }
+function initSwipe() {
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('mousedown', e => startSwipe(e, index));
+    tab.addEventListener('touchstart', e => startSwipe(e, index));
+  });
+
+  document.addEventListener('mousemove', onSwipeMove);
+  document.addEventListener('touchmove', onSwipeMove);
+  document.addEventListener('mouseup', endSwipe);
+  document.addEventListener('touchend', endSwipe);
+}
+
+function startSwipe(e, index){
+  currentTab = index;
+  startX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+}
+
+function onSwipeMove(e){
+  if(startX === null) return;
+  const x = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+  const dx = x - startX;
+  // اگر کشیدن بیش از 50px باشه
+  if(dx > 50 && currentTab > 0){ showTab(currentTab-1); startX=null; }
+  if(dx < -50 && currentTab < tabs.length-1){ showTab(currentTab+1); startX=null; }
+}
+window.addEventListener('DOMContentLoaded', initSwipe);
+
+function endSwipe(){ startX = null; }
